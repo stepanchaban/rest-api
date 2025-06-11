@@ -1,6 +1,9 @@
 package taskService
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+	"github.com/oapi-codegen/runtime/types"
+)
 
 type TaskService interface {
 	CreateTask(task string, isDone bool) (Task, error)
@@ -20,19 +23,20 @@ func NewTaskService(r TaskRepository) TaskService {
 
 
 func (s *taskService) CreateTask(task string, isDone bool) (Task, error) {
+
+	id := types.UUID(uuid.New())
+
 	newTask := Task{
-		ID:     uuid.NewString(),
+		ID:     id,
 		Task:   task,
 		IsDone: isDone,
 	}
 
-	 err := s.repo.CreateTask(newTask); 
-
-	 if err != nil {
-		 return Task{}, err
+	if err := s.repo.CreateTask(newTask); err != nil {
+		return Task{}, err
 	}
 
-	return newTask, err
+	return newTask, nil
 }
 
 func (s *taskService) GetAllTasks() ([]Task, error) {
